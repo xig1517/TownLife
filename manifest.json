@@ -1,0 +1,38 @@
+{
+    "format_version": 2,
+    "header": {
+        "description": "建構屬於你自己的城鎮！",
+        "name": "Town Life",
+        "uuid": "524a6cc8-0c90-4e69-9425-82815bcd285e",
+        "version": [
+            0,
+            0,
+            1
+        ],
+        "min_engine_version": [
+            1,
+            20,
+            50
+        ]
+    },
+    "modules": [
+        {
+            "description": "使用JavaScript編寫 可做為學習之素材",
+            "type": "script",
+            "language": "javascript",
+            "uuid": "59c74869-fbe8-44b0-99fa-5f9bf668497c",
+            "version": [
+                0,
+                0,
+                1
+            ],
+            "entry": "scripts/index.js"
+        }
+    ],
+    "dependencies": [
+        {
+            "module_name": "@minecraft/server",
+            "version": "1.12.0-beta"
+        }
+    ]
+}
