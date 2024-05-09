@@ -1,21 +1,21 @@
 import { Block, BlockPermutation, Dimension, Direction, Vector3, system } from "@minecraft/server";
 
 type OffsetType = [number, number, number];
-type PermutationDataType = [string, string | number | boolean]
 type BlockIdTableType = string[]
+type PermutationDataType = [string, string | number | boolean]
 
 type BlockInfo = [OffsetType, number, PermutationDataType[]] // offset, blockIdTable index, permutation data
-type OffsetDirection = [boolean, boolean] // positive expansion = true, negative expansion = false
-type ModelCode = [BlockIdTableType, OffsetDirection, BlockInfo[]]
+type ExpansionDirection = [boolean, boolean] // positive expansion = true, negative expansion = false
+type ModelCode = [BlockIdTableType, ExpansionDirection, BlockInfo[]]
 
-type ModelFileInfo = {
+type StructureInfo = {
     offset: Vector3, // can use Block.offset(Vector3)
     permutation: BlockPermutation
 }
 type ModelFile = {
     benchmarkOffset: [number, number],
-    facing: OffsetDirection,
-    info: ModelFileInfo[]
+    facing: ExpansionDirection,
+    info: StructureInfo[]
 }
 
 class Translator {
@@ -25,7 +25,7 @@ class Translator {
         let blockIdTable = new Array<string>;
         let structure = new Array<BlockInfo>;
 
-        let offsetDirection = [pos2.x - pos1.x >= 0, pos2.z - pos1.z >= 0];
+        let ExpansionDirection = [pos2.x - pos1.x >= 0, pos2.z - pos1.z >= 0];
         const [offsetX, offsetY, offsetZ] = [
             Math.abs(pos2.x - pos1.x) + 1,
             Math.abs(pos2.y - pos1.y) + 1,
@@ -37,9 +37,9 @@ class Translator {
                 for (let yi = 0; yi < offsetY; yi++) {
 
                     const location = {
-                        x: pos1.x + (offsetDirection[0] ? xi : -xi),
+                        x: pos1.x + (ExpansionDirection[0] ? xi : -xi),
                         y: pos1.y + yi,
-                        z: pos1.z + (offsetDirection[1] ? zi : -zi),
+                        z: pos1.z + (ExpansionDirection[1] ? zi : -zi),
                     }
                     const block = dimension.getBlock(location) as Block;
                     const blockId = block.typeId.replace("minecraft:", "")
@@ -59,7 +59,7 @@ class Translator {
                 }
             }
         }
-        return JSON.stringify([blockIdTable, offsetDirection, structure]);
+        return JSON.stringify([blockIdTable, ExpansionDirection, structure]);
     }
 
     /** Translate ModelCode to ModelFile */
@@ -139,7 +139,7 @@ class Rotation {
 
     rotateBuilding(to: Direction) {
 
-        const facingDir = function (dir: OffsetDirection) {
+        const facingDir = function (dir: ExpansionDirection) {
             switch (dir.toString()) {
                 case [false, true].toString(): return Direction.East;
                 case [false, false].toString(): return Direction.North;
