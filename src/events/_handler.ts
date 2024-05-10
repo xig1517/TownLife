@@ -1,8 +1,8 @@
 import chatSendBefore from "./chatSendBefore";
 import playerBreakBefore from "./playerBreakBefore";
 
-abstract class Building_EventHandler {
+abstract class EventHandler {
     static readonly chatSendBefore = chatSendBefore;
     static readonly playerBreakBefore = playerBreakBefore;
 }
-export default Building_EventHandler;
+export default EventHandler;
