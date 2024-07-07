@@ -5,7 +5,8 @@ abstract class chatSendBefore {
     static subscribe = (player: Player) => {
         return world.beforeEvents.chatSend.subscribe(ev => {
             if (ev.sender.name != player.name) return;
-            if (command_handler(ev.sender, ev.message)) ev.cancel = true;
+            command_handler(ev.sender, ev.message)
+            ev.cancel = true;
         });
     }
     static unsubscribe = (ev: (args: ChatSendBeforeEvent) => void) =>
