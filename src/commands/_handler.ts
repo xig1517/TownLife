@@ -20,7 +20,6 @@ function command_handler(sender: Player, cmd: string) {
         }
 
     } catch (errMsg: any) {
-        sender.sendMessage(errMsg);
         console.warn(errMsg);
         return false;
     }
