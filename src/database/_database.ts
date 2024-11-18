@@ -2,14 +2,18 @@ import { world, Vector3, Entity, Player } from "@minecraft/server";
 
 type ValueType = string | number | boolean | Vector3 | undefined;
 
-export class DataBase {
+export abstract class DataBase {
 
-    constructor(
-        private _identifier: string,
-        protected _target: Entity | Player | undefined = undefined
-    ) { }
+    private _target: Entity | Player | undefined = undefined
 
-    create(propertyName: string, value: ValueType = undefined) {
+    constructor(private _identifier: string) { }
+
+    setTarget(t: Entity | Player | undefined) {
+        this._target = t;
+        return this;
+    }
+
+    protected create(propertyName: string, value: ValueType = undefined) {
         const fullId = this._identifier + ":" + propertyName;
 
         (typeof this._target === "undefined") ?
@@ -17,7 +21,7 @@ export class DataBase {
             this._target?.setDynamicProperty(fullId, value)
     }
 
-    read(propertyName: string) {
+    protected read(propertyName: string) {
         try {
             const fullId = this._identifier + ":" + propertyName;
             return (typeof this._target === "undefined") ?
@@ -30,14 +34,14 @@ export class DataBase {
         }
     }
 
-    update(propertyName: string, value: ValueType) {
+    protected update(propertyName: string, value: ValueType) {
         const fullId = this._identifier + ":" + propertyName;
         (typeof this._target === "undefined") ?
             world.setDynamicProperty(fullId, value) :
             this._target?.setDynamicProperty(fullId, value)
     }
 
-    delete(propertyName: string) {
+    protected delete(propertyName: string) {
         const fullId = this._identifier + ":" + propertyName;
         (typeof this._target === "undefined") ?
             world.setDynamicProperty(fullId, undefined) :
