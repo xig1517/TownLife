@@ -1,42 +1,78 @@
-import { Block, Dimension, system, Vector3 } from "@minecraft/server";
-import { BuildingInfo } from "./declare/_types";
-import { DirectionType } from "./declare/enum";
-import { Rotater } from "./rotation";
+import {
+    world,
+
+    Dimension,
+    Vector3,
+
+    Structure,
+    StructurePlaceOptions,
+    StructureAnimationMode,
+    StructureMirrorAxis,
+    StructureRotation,
+
+} from "@minecraft/server";
+
+
 
 class Builder {
 
+    static readonly structurePrefix = "townlife";
+
     constructor(
+        private structure: Structure,
         private dimension: Dimension,
-        private facing: DirectionType,
         private startPoint: Vector3,
-        private buildingInfo: BuildingInfo
-    ) { }
+        private facing: number,         /* 0=[1,0], 1=[0,1], 2=[-1,0], 3=[0,-1] */
+    ) {
+        if (!structure.id.startsWith(Builder.structurePrefix)) throw Error("This structure is invalid (the identifier must be 'townlife').");
+    }
 
-    *#taskGenerator() {
-        const pivot = this.buildingInfo.position.pivot;
-
-        this.startPoint.x -= pivot.x;
-        this.startPoint.z -= pivot.z;
-        const startBlock = this.dimension.getBlock(this.startPoint) as Block;
-
-        for (const structure of this.buildingInfo.structure) {
-            const offsetBlock = startBlock.offset(structure.offset) as Block;
-            this.dimension.setBlockPermutation(offsetBlock.location, structure.permutation);
-            // yield;
+    #getRotation() {
+        switch (this.facing) {
+            case 0: return StructureRotation.None;
+            case 1: return StructureRotation.Rotate90;
+            case 2: return StructureRotation.Rotate180;
+            case 3: return StructureRotation.Rotate270;
         }
     }
 
-    startBuilding(timer: number = 0.05) {
+    #offset_startPoint() {
 
-        this.buildingInfo = Rotater.rotate(this.facing, this.buildingInfo);
-        const generator = this.#taskGenerator();
-
-        const taskId = system.runInterval(() => {
-            if (generator.next().done) removeTask();
-        }, timer * 20);
-        const removeTask = () => {
-            system.clearRun(taskId);
+        switch (this.facing) {
+            case 0: return this.startPoint.x += 1;
+            case 1: return [this.startPoint.x -= this.structure.size.z - 1, this.startPoint.z += 1]
+            case 2: return [this.startPoint.z -= this.structure.size.z - 1, this.startPoint.x -= this.structure.size.x]
+            case 3: return this.startPoint.z -= this.structure.size.x;
         }
     }
+
+    #getOptions(totalTime: number): StructurePlaceOptions {
+
+        const options: StructurePlaceOptions = {
+            animationMode: StructureAnimationMode.Blocks,
+            animationSeconds: totalTime,
+            includeBlocks: true,
+            includeEntities: false,
+            mirror: StructureMirrorAxis.None,
+            rotation: this.#getRotation(),
+            waterlogged: true
+        }
+        return options;
+    }
+
+    begin(totalTime: number = 10) {
+
+        const options = this.#getOptions(totalTime);
+        this.#offset_startPoint();
+
+        world.structureManager.place(
+            Builder.structurePrefix + ':' + this.structure.id,
+            this.dimension,
+            this.startPoint,
+            options
+        );
+    }
+
+
 }
 export { Builder };
