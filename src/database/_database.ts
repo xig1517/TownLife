@@ -2,31 +2,29 @@ import { world, Vector3, Entity, Player } from "@minecraft/server";
 
 type ValueType = string | number | boolean | Vector3 | undefined;
 
-export abstract class DataBase {
-
-    private _target: Entity | Player | undefined = undefined
+export class DataBase {
 
     constructor(private _identifier: string) { }
 
-    setTarget(t: Entity | Player | undefined) {
-        this._target = t;
-        return this;
+    protected create(
+        propertyName: string,
+        entity?: Entity | Player
+    ) {
+        const nameWithId = this._identifier + ":" + propertyName;
+        (entity == undefined) ?
+            world.setDynamicProperty(nameWithId) :
+            entity.setDynamicProperty(nameWithId)
     }
 
-    protected create(propertyName: string, value: ValueType = undefined) {
-        const fullId = this._identifier + ":" + propertyName;
-
-        (typeof this._target === "undefined") ?
-            world.setDynamicProperty(fullId, value) :
-            this._target?.setDynamicProperty(fullId, value)
-    }
-
-    protected read(propertyName: string) {
+    protected read(
+        propertyName: string,
+        entity?: Entity | Player
+    ) {
+        const nameWithId = this._identifier + ":" + propertyName;
         try {
-            const fullId = this._identifier + ":" + propertyName;
-            return (typeof this._target === "undefined") ?
-                world.getDynamicProperty(fullId) :
-                this._target?.getDynamicProperty(fullId);
+            return (entity == undefined) ?
+                world.getDynamicProperty(nameWithId) :
+                entity.getDynamicProperty(nameWithId)
         }
         catch {
             console.warn("You must create the property before read it.")
@@ -34,18 +32,25 @@ export abstract class DataBase {
         }
     }
 
-    protected update(propertyName: string, value: ValueType) {
-        const fullId = this._identifier + ":" + propertyName;
-        (typeof this._target === "undefined") ?
-            world.setDynamicProperty(fullId, value) :
-            this._target?.setDynamicProperty(fullId, value)
+    protected update(
+        propertyName: string,
+        value: ValueType,
+        entity?: Entity | Player
+    ) {
+        const nameWithId = this._identifier + ":" + propertyName;
+        (entity == undefined) ?
+            world.setDynamicProperty(nameWithId, value) :
+            entity.setDynamicProperty(nameWithId, value)
     }
 
-    protected delete(propertyName: string) {
-        const fullId = this._identifier + ":" + propertyName;
-        (typeof this._target === "undefined") ?
-            world.setDynamicProperty(fullId, undefined) :
-            this._target?.setDynamicProperty(fullId, undefined)
+    protected delete(
+        propertyName: string,
+        entity?: Entity | Player
+    ) {
+        const nameWithId = this._identifier + ":" + propertyName;
+        (entity == undefined) ?
+            world.setDynamicProperty(nameWithId, undefined) :
+            entity.setDynamicProperty(nameWithId, undefined)
     }
 
 }
