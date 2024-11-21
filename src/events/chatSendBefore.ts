@@ -1,11 +1,11 @@
-import { ChatSendBeforeEvent, Player, world } from "@minecraft/server";
+import { ChatSendBeforeEvent, Player, world, system } from "@minecraft/server";
 import { command_handler } from "../commands/_handler";
 
 abstract class chatSendBefore {
     static subscribe = (player: Player) => {
         return world.beforeEvents.chatSend.subscribe(ev => {
             if (ev.sender.name != player.name) return;
-            command_handler(ev.sender, ev.message)
+            system.run(() => command_handler(ev.sender, ev.message));
             ev.cancel = true;
         });
     }
