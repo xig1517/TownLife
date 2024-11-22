@@ -18,13 +18,15 @@ class Builder {
 
     static readonly structurePrefix = "townlife";
 
+    private structure: Structure;
+
     constructor(
-        private structure: Structure,
+        private structureId: string,
         private dimension: Dimension,
         private startPoint: Vector3,
-        private facing: number,         /* 0=[1,0], 1=[0,1], 2=[-1,0], 3=[0,-1] */
+        private facing: number,         // 0=[1,0], 1=[0,1], 2=[-1,0], 3=[0,-1]
     ) {
-        if (!structure.id.startsWith(Builder.structurePrefix)) throw Error("This structure is invalid (the identifier must be 'townlife').");
+        this.structure = world.structureManager.get(Builder.structurePrefix + ':' + structureId) as Structure;
     }
 
     #getRotation() {
@@ -66,7 +68,7 @@ class Builder {
         this.#offset_startPoint();
 
         world.structureManager.place(
-            Builder.structurePrefix + ':' + this.structure.id,
+            Builder.structurePrefix + ':' + this.structureId,
             this.dimension,
             this.startPoint,
             options
