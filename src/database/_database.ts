@@ -1,56 +1,52 @@
-import { world, Vector3, Entity, Player } from "@minecraft/server";
+import { world, Vector3, Entity } from "@minecraft/server";
 
 type ValueType = string | number | boolean | Vector3 | undefined;
 
-export class DataBase {
+class DataBase {
 
     constructor(private _identifier: string) { }
 
     protected create(
         propertyName: string,
-        entity?: Entity | Player
+        entity?: Entity
     ) {
         const nameWithId = this._identifier + ":" + propertyName;
+        if (this.read(nameWithId) != undefined) return false;
         (entity == undefined) ?
             world.setDynamicProperty(nameWithId) :
             entity.setDynamicProperty(nameWithId)
+        return true;
     }
 
     protected read(
         propertyName: string,
-        entity?: Entity | Player
+        entity?: Entity
     ) {
         const nameWithId = this._identifier + ":" + propertyName;
-        try {
-            return (entity == undefined) ?
-                world.getDynamicProperty(nameWithId) :
-                entity.getDynamicProperty(nameWithId)
-        }
-        catch {
-            console.warn("You must create the property before read it.")
-            return undefined;
-        }
+        return (entity == undefined) ?
+            world.getDynamicProperty(nameWithId) :
+            entity.getDynamicProperty(nameWithId)
     }
 
     protected update(
         propertyName: string,
         value: ValueType,
-        entity?: Entity | Player
+        entity?: Entity
     ) {
         const nameWithId = this._identifier + ":" + propertyName;
         (entity == undefined) ?
             world.setDynamicProperty(nameWithId, value) :
             entity.setDynamicProperty(nameWithId, value)
+
+        return true;
     }
 
     protected delete(
         propertyName: string,
-        entity?: Entity | Player
+        entity?: Entity
     ) {
-        const nameWithId = this._identifier + ":" + propertyName;
-        (entity == undefined) ?
-            world.setDynamicProperty(nameWithId, undefined) :
-            entity.setDynamicProperty(nameWithId, undefined)
+        return this.update(propertyName, undefined, entity);
     }
 
 }
+export { DataBase }
