@@ -6,10 +6,10 @@ abstract class chatSend {
         return world.beforeEvents.chatSend.subscribe(ev => {
             if (ev.sender.name != player.name) return;
 
-            if (ev.message.startsWith('-'))
+            if (ev.message.startsWith('-')) {
                 system.run(() => command_handler(ev.sender, ev.message));
-
-            ev.cancel = true;
+                ev.cancel = true;
+            }
         });
     }
     static unsubscribe = (ev: (args: ChatSendBeforeEvent) => void) =>
