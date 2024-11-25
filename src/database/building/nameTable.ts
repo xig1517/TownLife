@@ -1,21 +1,21 @@
 import { world } from "@minecraft/server";
 import GameSystem from "../../system";
 import { DataBase } from "../_database";
-import { StructureDatabase } from "./structureDB";
+import { BuildingDatabase } from "./buildingDB";
 
-/**
- * Please ensure the direction of the structure you want to store is x->+, z->+
- * 
- * structure files in folder "structures" showing structure id, and you
- * should register the structure into database and read it by its structure name 
- */
+/*
+Please ensure the direction of the structure you want to store is x->+, z->+
+
+structure files in folder "structures" showing structure id, and you
+should register the structure into database and read it by its structure name 
+*/
 
 class NameTable extends DataBase {
 
-    readonly propertyId = "structure_nameTable";
+    readonly propertyId = "building_nameTable";
 
     constructor() {
-        super(StructureDatabase.databaseId);
+        super(BuildingDatabase.databaseId);
 
         if (this.create(this.propertyId))
             this.update(this.propertyId, "[]");
